@@ -1,62 +1,35 @@
-import React from "react";
+import React, { Suspense } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Login from "./pages/Login";
-import ProtectedRoute from "./components/ProtectedRoute";
-import Navbar from "./components/Navbar";
-import OwnerDashboard from "./pages/OwnerDashboard";
-import Unauthorized from "./pages/Unauthorized";
-import ManagerDashboard from "./pages/ManagerDashboard";
-import InstructorDashboard from "./pages/InstructorDashboard";
-import StudentDashboard from "./pages/StudentDashboard";
-import { AuthProvider } from "./context/AuthContext";
-import { useSelector } from "react-redux";
+import { CircularProgress } from "@mui/material";
+// import MyCourses from "./pages/Student/MyCourses";
 
-function App() {
-  const auth = useSelector((state) => state.auth);
-  return (
-    <AuthProvider>
-      <Router>
-        {auth.isAuthenticated && <Navbar/>}
-        <Routes>
-          <Route path="/" element={<Login />} />
-          <Route path="/unauthorized" element={<Unauthorized />} />
+const Home = React.lazy(() => import("./pages/Home"));
+const Login = React.lazy(() => import("./pages/Login"));
+const Signup = React.lazy(() => import("./pages/Signup"));
+const InstructorDashboard = React.lazy(() => import("./pages/Instructor/InstructorDashboard"));
+const InstructorCourses = React.lazy(() => import("./pages/Instructor/InstructorCourses"));
+const StudentCourses = React.lazy(() => import("./pages/Student/MyCourses"));
+const CourseForm = React.lazy(() => import("./pages/Instructor/CourseForm"));
+const CourseListing = React.lazy(() => import("./pages/CourseListing"));
+const CourseDetails = React.lazy(() => import("./pages/CourseDetails"));
 
-          <Route
-            path="/owner"
-            element={
-              <ProtectedRoute allowedRoles={["Owner"]}>
-                <OwnerDashboard />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/manager"
-            element={
-              <ProtectedRoute allowedRoles={["Owner","Manager"]}>
-                <ManagerDashboard />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/instructor"
-            element={
-              <ProtectedRoute allowedRoles={["Owner","Manager","Instructor"]}>
-                <InstructorDashboard />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/student"
-            element={
-              <ProtectedRoute allowedRoles={["Owner","Manager","Instructor","Student"]}>
-                <StudentDashboard />
-              </ProtectedRoute>
-            }
-          />
-        </Routes>
-      </Router>
-    </AuthProvider>
-  );
-}
+const App = () => (
+  <Router>
+    <Suspense fallback={<div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh" }}><CircularProgress/></div>}>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/courses" element={<CourseListing />} />
+        <Route path="/course/:id" element={<CourseDetails />} />
+        <Route path="/instructor/dashboard" element={<InstructorDashboard />} />
+        <Route path="/instructor/courses" element={<InstructorCourses />}/>
+        <Route path="/Student/MyCourses" element={<StudentCourses />}/>
+        <Route path="/instructor/course/new" element={<CourseForm />}/>
+        <Route path="/instructor/course/:id/edit" element={<CourseForm />}/>
+      </Routes>
+    </Suspense>
+  </Router>
+);
 
 export default App;

@@ -1,132 +1,81 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { AppBar, Toolbar, Typography, Box, Button, TextField, Menu, MenuItem, IconButton } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { logout } from "../redux/slices/authSlice";
-import { Drawer, List, ListItem, ListItemIcon, ListItemText, Typography, Box } from "@mui/material";
-import LogoutIcon from '@mui/icons-material/Logout';
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import SchoolIcon from '@mui/icons-material/School';
-import InventoryIcon from '@mui/icons-material/Inventory';
-import PeopleIcon from '@mui/icons-material/People';
-import DashboardIcon from '@mui/icons-material/Dashboard';
+
 
 const Navbar = () => {
-  const auth = useSelector((state) => state.auth);
+  const navigate = useNavigate();
   const dispatch = useDispatch();
+  const { isAuthenticated, user } = useSelector((state) => state.auth)
+
+  const [anchorE1, setAnchorE1] = React.useState(null);
+  const open = Boolean(anchorE1);
+
+  const handleMenuOpen = (event) => {
+    setAnchorE1(event.currentTarget);
+  };
+
+  const handleMenuClose = () =>{
+    dispatch(logout());
+    navigate("/");
+    handleMenuClose();
+  };
 
   const handleLogout = () => {
     dispatch(logout());
-    window.location.href = "/";
+    navigate("/");
+    handleMenuClose();
   };
-
-  const renderLinks = () => {
-    if (!auth.isAuthenticated) {
-      return null;
-    }
-
-    switch (auth.user.role) {
-      case "Owner":
-        return (
-          <>
-            <ListItem button component={Link} to="/owner">
-              <ListItemIcon>
-                <DashboardIcon/>
-              </ListItemIcon>
-              <ListItemText primary="Owner Dashboard"/>
-            </ListItem>
-            <ListItem button component={Link} to="/owner/manage-users">
-              <ListItemIcon>
-                <PeopleIcon/>
-              </ListItemIcon>
-              <ListItemText primary="Manage Users"/>
-            </ListItem>
-            <ListItem button component={Link} to="/owner/manage-orders">
-              <ListItemIcon>
-                <ShoppingCartIcon/>
-              </ListItemIcon>
-              <ListItemText primary="Manage Orders" />
-            </ListItem>
-            <ListItem button component={Link} to="/owner/manage-products">
-              <ListItemIcon>
-                <InventoryIcon/>
-              </ListItemIcon>
-              <ListItemText primary="Manage Products" />
-            </ListItem>
-          </>
-        );
-      case "Manager":
-        return (
-          <>
-            <ListItem button component={Link} to="/manager">
-              <ListItemIcon>
-                <DashboardIcon/>
-              </ListItemIcon>
-              <ListItemText primary="Manager Dashboard" />
-            </ListItem>
-            <ListItem button component={Link} to="/instructors">
-              <ListItemIcon>
-                <SchoolIcon/>
-              </ListItemIcon>
-              <ListItemText primary="Manage Instructors" />
-            </ListItem>
-            <ListItem button component={Link} to="/students">
-              <ListItemIcon>
-                <SchoolIcon/>
-              </ListItemIcon>
-              <ListItemText primary="Manage Students" />
-            </ListItem>
-          </>
-        );
-      case "Instructor":
-        return (
-          <>
-            <ListItem button component={Link} to="/instructor">
-              <ListItemIcon>
-                <DashboardIcon/>
-              </ListItemIcon>
-              <ListItemText primary="Instructor Dashboard" />
-            </ListItem>
-            <ListItem button component={Link} to="/students">
-              <ListItemIcon>
-                <SchoolIcon/>
-              </ListItemIcon>
-              <ListItemText primary="Manage Students" />
-            </ListItem>
-          </>
-        );
-      case "Student":
-        return (
-          <ListItem button component={Link} to="/student">
-            <ListItemIcon>
-              <DashboardIcon/>
-            </ListItemIcon>
-            <ListItemText primary="Student Dashboard" />
-          </ListItem>
-        );
-      default:
-        return null;
-    }
-  };
-
   return (
-    <Drawer variant="permanent" anchor="left">
-      <Box sx={{ width: 250 }}>
-        <Typography variant="h6" sx={{ p: 2 }}>
-          RBAC Dashboard
+    <AppBar position="static" margin="0">
+      <Toolbar>
+        <Typography
+          variant="h6"
+          sx={{ flexGrow: 1, cursor: "pointer" }}
+          onClick={() => navigate("/")} // Corrected onClick
+        >
+          LearnVise
         </Typography>
-      </Box>
-      <List>
-        {renderLinks()}
-        {auth.isAuthenticated && (
-          <ListItem button onClick={handleLogout}>
-            <ListItemIcon>
-              <LogoutIcon/>
-            </ListItemIcon>
-            <ListItemText primary="Logout" />
-          </ListItem>
-        )}
-      </List>
-    </Drawer>
+
+        <Box sx={{ flexGrow: 1 }}>
+          <TextField
+            fullWidth
+            placeholder="Start Exploring"
+            variant="outlined"
+            size="small"
+            sx={{ bgcolor: "white", borderRadius: 1 }}
+          />
+        </Box>
+
+        <Box sx={{ display: "flex", gap: 2 }}>
+          { isAuthenticated ? (
+            <>
+             <IconButton color="inherit" onClick={handleMenuOpen}>
+              <AccountCircleIcon/>
+             </IconButton>
+             <Menu anchorEl={anchorE1} open={open} onClose={handleMenuClose} anchorOrigin={{ vertical: "top", horizontal: "right" }}>
+              <MenuItem onClick={() => navigate("/profile")}>Profile</MenuItem>
+              <MenuItem onClick={() => navigate("/settings")}>Settings</MenuItem>
+              <MenuItem onClick={handleLogout}>Logout</MenuItem>
+             </Menu>
+            </>
+          ) : (
+            <>
+              <Button color="inherit" onClick={() => navigate("/login")}> {/* Corrected onClick */}
+                Login
+              </Button>
+              <Button variant="contained" color="secondary" onClick={() => navigate("/signup")}> {/* Corrected onClick */}
+                SignUp
+              </Button>
+            </>
+          )}
+        </Box>
+      </Toolbar>
+    </AppBar>
   );
 };
+
 export default Navbar;

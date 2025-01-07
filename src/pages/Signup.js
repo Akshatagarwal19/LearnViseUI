@@ -1,26 +1,12 @@
 import React, { useState } from "react";
-import {
-  Container,
-  Box,
-  Typography,
-  TextField,
-  Button,
-  CircularProgress,
-} from "@mui/material";
-import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { Container, Box, Typography, TextField, Button, CircularProgress } from "@mui/material";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import axios from "axios";
-import { jwtDecode } from "jwt-decode";
-import { login } from "../redux/slices/authSlice"; // Import the login action
 
-const Login = () => {
-  const [form, setForm] = useState({ email: "", password: "" });
+const Signup = () => {
+  const [form, setForm] = useState({ username: "", email: "", password: "" });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -30,55 +16,20 @@ const Login = () => {
     e.preventDefault();
     setLoading(true);
     setError("");
-  
     try {
-    const response = await axios.post(
-        "http://localhost:3001/api/auth/login",
-        form,
-        { withCredentials: true }
-      );
-      console.log("Login response:", response);
-      // Extract token from cookies
-      console.log("Document cookies:", document.cookie);
-      const token = document.cookie
-        .split('; ')
-        .find((row) => row.startsWith('authToken=')) // Updated to 'authToken'
-        ?.split('=')[1];
-  
-      if (!token) {
-        console.error("Token not found in document.cookie:", document.cookie);
-        throw new Error("No token found in cookies.");
-      }
-  
-      // Decode token and proceed
-      const decoded = jwtDecode(token);
-      const { username, role } = decoded;
-  
-      // Dispatch to Redux
-      dispatch(login({ username, role }));
-  
-      // Redirect based on role
-      if (role === "Instructor") {
-        navigate("/instructor/dashboard");
-      } else {
-        navigate("/");
-      }
+      // Handle signup API call here
+      console.log("Signing up with:", form);
     } catch (err) {
-      console.error("Login error:", err.message || err.response?.data);
-      setError("Invalid email or password.");
+      setError("Signup failed. Try again.");
     } finally {
       setLoading(false);
     }
   };
 
-
   return (
     <>
       <Navbar />
-      <Container
-        maxWidth="sm"
-        sx={{ minHeight: "70vh", display: "flex", alignItems: "center" }}
-      >
+      <Container maxWidth="sm" sx={{ minHeight: "70vh", display: "flex", alignItems: "center" }}>
         <Box
           component="form"
           onSubmit={handleSubmit}
@@ -91,9 +42,17 @@ const Login = () => {
           }}
         >
           <Typography variant="h4" align="center" gutterBottom>
-            Login
+            Signup
           </Typography>
           <Box display="flex" flexDirection="column" gap={2}>
+            <TextField
+              label="Username"
+              name="username"
+              value={form.username}
+              onChange={handleChange}
+              fullWidth
+              required
+            />
             <TextField
               label="Email"
               name="email"
@@ -125,11 +84,7 @@ const Login = () => {
               sx={{ padding: "1rem" }}
               disabled={loading}
             >
-              {loading ? (
-                <CircularProgress size={24} color="inherit" />
-              ) : (
-                "Login"
-              )}
+              {loading ? <CircularProgress size={24} color="inherit" /> : "Signup"}
             </Button>
           </Box>
         </Box>
@@ -139,4 +94,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Signup;
