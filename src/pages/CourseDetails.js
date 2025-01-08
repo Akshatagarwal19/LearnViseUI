@@ -3,24 +3,38 @@ import { useParams } from 'react-router-dom';
 import courseApi from '../services/apiService';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import { Button, Typography, Card, CardContent, CircularProgress, Container } from '@mui/material';
+import {
+  Button,
+  Typography,
+  Card,
+  CircularProgress,
+  Container,
+  Box,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+} from '@mui/material';
+import PlayCircleIcon from '@mui/icons-material/PlayCircle';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import StarIcon from '@mui/icons-material/Star';
 
 const CourseDetails = () => {
-  const { id } = useParams(); // Extract course ID from the URL
-  const [courseData, setCourseData] = useState(null);
+  const { id } = useParams();
+  const [courseData, setCourseData] = useState({ course: { sections: [] } });
   const [isEnrolled, setIsEnrolled] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchCourseDetails = async () => {
       try {
-        const response = await courseApi.getCourseById(id);
-        setCourseData(response);
-        
-        // Check if the user is enrolled in the course
-        setIsEnrolled(response.enrollments.some(enrollment => enrollment.course._id === id));
+        const courseResponse = await courseApi.getCourseById(id);
+        setCourseData(courseResponse);
+
+        const enrollmentResponse = await courseApi.checkEnrollmentStatus(id);
+        setIsEnrolled(enrollmentResponse.isEnrolled);
       } catch (error) {
         console.error('Error fetching course details:', error);
+        alert('Failed to load course details. Please try again later.');
       } finally {
         setLoading(false);
       }
@@ -29,73 +43,106 @@ const CourseDetails = () => {
     fetchCourseDetails();
   }, [id]);
 
-  if (loading) return <CircularProgress />;
-
-  if (!courseData) return <Typography variant="h6">Course not found.</Typography>;
-
   const enrollInCourse = async () => {
     try {
-      const response = await courseApi.enrollCourse(id);
+      await courseApi.enrollCourse(id);
       alert('Enrollment successful!');
-      setIsEnrolled(true); // Update the state after successful enrollment
+      setIsEnrolled(true);
+
+      const updatedCourse = await courseApi.getCourseById(id);
+      setCourseData(updatedCourse);
     } catch (error) {
       console.error('Error enrolling in course:', error);
-      alert('Failed to enroll in course');
+      alert('Failed to enroll in course.');
     }
   };
 
+  if (loading) {
+    return (
+      <Container sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '80vh' }}>
+        <CircularProgress />
+      </Container>
+    );
+  }
+
+  if (!courseData?.course?.title) {
+    return (
+      <Typography variant="h6" sx={{ textAlign: 'center', marginTop: 2 }}>
+        Course not found.
+      </Typography>
+    );
+  }
+
+  const renderLessons = (lessons) =>
+    lessons
+      ?.filter((lesson) => isEnrolled || lesson.price === 0)
+      ?.map((lesson) => (
+        <li key={lesson._id} style={{ marginBottom: '10px' }}>
+          <PlayCircleIcon sx={{ marginRight: 1, verticalAlign: 'middle' }} />
+          <a href={lesson.videoUrl} target="_blank" rel="noopener noreferrer">
+            {lesson.title} {lesson.price === 0 && <span style={{ color: '#28a745' }}>(Free)</span>}
+          </a>
+        </li>
+      ));
+
   return (
     <>
-    <Navbar/>
-    <Container>
-      <Card>
-        <CardContent>
-          <Typography variant="h4">{courseData.course.title}</Typography>
-          <Typography variant="body1">{courseData.course.description}</Typography>
-          <img src={courseData.course.thumbnail} alt={courseData.course.title} style={{ width: '100%', height: 'auto' }} />
-          
-          {/* Check enrollment status and show content accordingly */}
-          {isEnrolled ? (
-            <>
-              <Typography variant="h5" gutterBottom>Course Content</Typography>
-              {courseData.course.sections.map((section) => (
-                <div key={section._id}>
-                  <Typography variant="h6">{section.title}</Typography>
-                  <Typography variant="body2">{section.description}</Typography>
-                  <ul>
-                    {section.lessons.map((lesson) => (
-                      <li key={lesson._id}>
-                        <a href={lesson.videoUrl} target="_blank" rel="noopener noreferrer">{lesson.title}</a>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
-            </>
-          ) : (
-            <>
-              <Typography variant="h5" gutterBottom>Free Lessons</Typography>
-              {courseData.course.sections.map((section) => (
-                <div key={section._id}>
-                  <Typography variant="h6">{section.title}</Typography>
-                  <ul>
-                    {section.lessons.filter(lesson => lesson.price === 0).map((lesson) => (
-                      <li key={lesson._id}>
-                        <a href={lesson.videoUrl} target="_blank" rel="noopener noreferrer">{lesson.title}</a>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
-              <Button variant="contained" color="primary" onClick={enrollInCourse}>
-                Enroll Now
-              </Button>
-            </>
-          )}
-        </CardContent>
-      </Card>
-    </Container>
-    <Footer />
+      <Navbar />
+      <Box sx={{ backgroundColor: '#f7f7f7', padding: 2 }}>
+        <Container>
+          <Typography variant="h3" gutterBottom>
+            {courseData.course.title}
+          </Typography>
+          <Typography variant="subtitle1" color="textSecondary" gutterBottom>
+            Created by {courseData.course.instructor?.name || 'Unknown Instructor'}
+          </Typography>
+          <Box display="flex" alignItems="center" gap={1} sx={{ marginBottom: 1 }}>
+            <StarIcon sx={{ color: '#FFD700' }} />
+            <Typography variant="body2" color="textSecondary">
+              4.5 (1200 ratings)
+            </Typography>
+          </Box>
+          <Typography variant="body1" paragraph>
+            {courseData.course.description}
+          </Typography>
+          <img
+            src={courseData.course.thumbnail}
+            alt={courseData.course.title}
+            style={{ width: '100%', borderRadius: '8px', marginBottom: '20px' }}
+          />
+        </Container>
+      </Box>
+      <Container>
+        <Card elevation={3} sx={{ padding: 2, marginBottom: 2, textAlign: 'center' }}>
+          <Typography variant="h4" sx={{ fontWeight: 'bold', marginBottom: 2 }}>
+            ${courseData.course.price}
+          </Typography>
+          <Button
+            variant="contained"
+            color="primary"
+            fullWidth
+            sx={{ marginTop: 2 }}
+            onClick={enrollInCourse}
+            disabled={isEnrolled}
+          >
+            {isEnrolled ? 'Enrolled' : 'Enroll Now'}
+          </Button>
+        </Card>
+        <Typography variant="h5" sx={{ marginTop: 4, marginBottom: 2 }}>
+          {isEnrolled ? 'Course Content' : 'Free Lessons'}
+        </Typography>
+        {courseData.course.sections.map((section) => (
+          <Accordion key={section._id}>
+            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+              <Typography variant="h6">{section.title}</Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              <ul style={{ listStyle: 'none', padding: 0 }}>{renderLessons(section.lessons)}</ul>
+            </AccordionDetails>
+          </Accordion>
+        ))}
+      </Container>
+      <Footer />
     </>
   );
 };

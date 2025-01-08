@@ -72,6 +72,16 @@ const courseApi = {
     }
   },
 
+  checkEnrollmentStatus: async (courseId) => {
+    try {
+      const response = await axiosInstance.get(`http://localhost:3001/api/enrollment/check-status/${courseId}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error checking enrollment status:', error);
+      throw error;
+    }
+  },
+
   enrollCourse: async (courseId) => {
     try {
       const response = await axiosInstance.post(`/enrollment/enroll/${courseId}`);
