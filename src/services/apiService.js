@@ -11,7 +11,7 @@ axiosInstance.interceptors.request.use(
   (config) => {
     const token = document.cookie
       .split('; ')
-      .find((row) => row.startsWith('token='))
+      .find((row) => row.startsWith('authToken='))
       ?.split('=')[1];
     console.log('Retrieved Token:', token);
     if (token) {
@@ -59,6 +59,16 @@ const courseApi = {
       return response.data.courses;  // Return only the courses part of the response
     } catch (err) {
       throw new Error("Failed to fetch courses: " + err.message);
+    }
+  },
+
+  getEnrolledCourses: async () => {
+    try {
+      const response = await axiosInstance.get('http://localhost:3001/api/enrollment/details');
+      return response.data.enrollments;
+    } catch (error) {
+      console.error("Error fetching enrolled courses:", error.response?.data || error.message);
+      throw new Error("Failed to fetch enrolled courses: " + error.message);
     }
   },
 

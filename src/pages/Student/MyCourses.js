@@ -6,15 +6,17 @@ import Footer from '../../components/Footer';
 import { Card, CardContent, CardMedia, Typography, Button, Container, Grid2, CircularProgress } from '@mui/material';
 
 const MyCourses = () => {
-  const [courses, setCourses] = useState([]);
+  const [enrolledCourses, setEnrolledCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchEnrolledCourses = async () => {
       try {
-        const response = await courseApi.getEnrolledCourses();
-        setCourses(response);
+        const courses = await courseApi.getEnrolledCourses(); // Fetch enrolled courses
+        // We need to extract the course data from each enrollment object
+        const courseData = courses.map((enrollment) => enrollment.course);
+        setEnrolledCourses(courseData);
       } catch (error) {
         console.error('Error fetching enrolled courses:', error);
       } finally {
@@ -40,9 +42,11 @@ const MyCourses = () => {
         <Typography variant="h4" gutterBottom>
           My Courses
         </Typography>
-        {courses.length > 0 ? (
+        {enrolledCourses.length === 0 ? (
+          <Typography variant="h6">You are not enrolled in any courses.</Typography>
+        ) : (
           <Grid2 container spacing={4}>
-            {courses.map((course) => (
+            {enrolledCourses.map((course) => (
               <Grid2 item key={course._id} xs={12} sm={6} md={4}>
                 <Card>
                   <CardMedia
@@ -72,10 +76,6 @@ const MyCourses = () => {
               </Grid2>
             ))}
           </Grid2>
-        ) : (
-          <Typography variant="body1" color="textSecondary">
-            You haven't enrolled in any courses yet. Explore and enroll in courses to start learning!
-          </Typography>
         )}
       </Container>
       <Footer />
