@@ -57,9 +57,9 @@ const courseApi = {
     try {
       const response = await axios.get("http://localhost:3001/api/courses");
       return response.data.courses;  // Return only the courses part of the response
-  } catch (err) {
+    } catch (err) {
       throw new Error("Failed to fetch courses: " + err.message);
-  }
+    }
   },
 
   enrollCourse: async (courseId) => {
@@ -68,7 +68,7 @@ const courseApi = {
       return response.data;
     } catch (error) {
       console.error("Error enrolling in course", error.response?.data || error.message);
-      throw new Error("Failed ti enroll in coursr");
+      throw new Error("Failed to enroll in course");
     }
   },
 
@@ -81,7 +81,7 @@ const courseApi = {
       throw new Error('Failed to fetch enrollments');
     }
   },
-  
+
   getCourseById: async (courseId) => {
     try {
       const response = await axiosInstance.get(`/courses/${courseId}`);
@@ -91,7 +91,16 @@ const courseApi = {
       throw new Error('Failed to fetch course');
     }
   },
-  
+
+  logout: async () => {
+    try {
+      const response = await axiosInstance.post('/auth/logout'); // Adjust endpoint as needed
+      return response;
+    } catch (error) {
+      console.error('Error during logout:', error.response?.data || error.message);
+      throw new Error('Failed to log out');
+    }
+  },
 };
 
 export default courseApi;

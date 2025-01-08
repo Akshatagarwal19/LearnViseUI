@@ -1,111 +1,85 @@
-import React, { useState, useEffect } from "react";
-import {
-  Box,
-  Typography,
-  Grid,
-  Card,
-  CardMedia,
-  CardContent,
-  Button,
-  LinearProgress,
-} from "@mui/material";
-import Navbar from "../../components/Navbar"; // Adjust the import paths as per your structure
-import Footer from "../../components/Footer";
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import courseApi from '../../services/apiService';
+import Navbar from '../../components/Navbar';
+import Footer from '../../components/Footer';
+import { Card, CardContent, CardMedia, Typography, Button, Container, Grid2, CircularProgress } from '@mui/material';
 
 const MyCourses = () => {
   const [courses, setCourses] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
-  // Mock data (Replace this with API fetch later)
   useEffect(() => {
-    const mockCourses = [
-      {
-        id: "1",
-        title: "React Basics",
-        thumbnail: "https://via.placeholder.com/300x150?text=React+Basics",
-        progress: 75,
-        description: "Learn the basics of React.",
-        instructor: "John Doe",
-        lastAccessed: "Introduction to Props",
-      },
-      {
-        id: "2",
-        title: "Node.js Mastery",
-        thumbnail: "https://via.placeholder.com/300x150?text=Node.js+Mastery",
-        progress: 40,
-        description: "Become a Node.js expert.",
-        instructor: "Jane Smith",
-        lastAccessed: "Express.js Basics",
-      },
-    ];
-    setCourses(mockCourses);
+    const fetchEnrolledCourses = async () => {
+      try {
+        const response = await courseApi.getEnrolledCourses();
+        setCourses(response);
+      } catch (error) {
+        console.error('Error fetching enrolled courses:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchEnrolledCourses();
   }, []);
 
+  if (loading) {
+    return (
+      <Container style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '80vh' }}>
+        <CircularProgress />
+      </Container>
+    );
+  }
+
   return (
-    <Box>
+    <>
       <Navbar />
-      <Box sx={{ padding: 3 }}>
+      <Container sx={{ py: 4 }}>
         <Typography variant="h4" gutterBottom>
           My Courses
         </Typography>
         {courses.length > 0 ? (
-          <Grid container spacing={3}>
+          <Grid2 container spacing={4}>
             {courses.map((course) => (
-              <Grid item xs={12} sm={6} md={4} key={course.id}>
+              <Grid2 item key={course._id} xs={12} sm={6} md={4}>
                 <Card>
                   <CardMedia
                     component="img"
-                    height="150"
-                    image={course.thumbnail}
+                    height="140"
+                    image={course.thumbnail || 'https://via.placeholder.com/300'}
                     alt={course.title}
                   />
                   <CardContent>
-                    <Typography variant="h6">{course.title}</Typography>
-                    <Typography
-                      variant="body2"
-                      color="textSecondary"
-                      gutterBottom
-                    >
-                      {course.description}
+                    <Typography variant="h6" gutterBottom>
+                      {course.title}
                     </Typography>
                     <Typography variant="body2" color="textSecondary">
-                      Instructor: {course.instructor}
+                      {course.description.slice(0, 100)}...
                     </Typography>
-                    <Typography variant="body2" color="textSecondary">
-                      Last Accessed: {course.lastAccessed}
-                    </Typography>
-                    <Box sx={{ my: 2 }}>
-                      <Typography variant="body2">Progress:</Typography>
-                      <LinearProgress
-                        variant="determinate"
-                        value={course.progress}
-                        sx={{ height: 10, borderRadius: 5 }}
-                      />
-                      <Typography
-                        variant="body2"
-                        sx={{ mt: 0.5, textAlign: "right" }}
-                      >
-                        {course.progress}%
-                      </Typography>
-                    </Box>
                     <Button
                       variant="contained"
                       color="primary"
                       size="small"
-                      fullWidth
+                      onClick={() => navigate(`/course/${course._id}`)}
+                      sx={{ mt: 2 }}
                     >
-                      Resume
+                      Go to Course
                     </Button>
                   </CardContent>
                 </Card>
-              </Grid>
+              </Grid2>
             ))}
-          </Grid>
+          </Grid2>
         ) : (
-          <Typography>No courses found.</Typography>
+          <Typography variant="body1" color="textSecondary">
+            You haven't enrolled in any courses yet. Explore and enroll in courses to start learning!
+          </Typography>
         )}
-      </Box>
+      </Container>
       <Footer />
-    </Box>
+    </>
   );
 };
 
