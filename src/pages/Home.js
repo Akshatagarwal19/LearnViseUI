@@ -221,13 +221,8 @@ const Homepage = () => {
                   },
                 }}
               >
-                <CardActionArea>
-                  <CardMedia
-                    component="img"
-                    height="200"
-                    image={course.thumbnail}
-                    alt={course.title}
-                  />
+                <CardActionArea LinkComponent={Link} to={`/course/${course._id}`}>
+                  <CardMedia component="img" height="200" image={course.thumbnail} alt={course.title} />
                   <CardContent>
                     <Typography gutterBottom variant="h6" component="div">
                       {course.title}
@@ -248,7 +243,6 @@ const Homepage = () => {
                     >
                       {course.isEnrolled ? "Goto Course" : "Enroll Now"}
                     </Button>
-                    <Link to={`/course/${course._id}`}>View Details</Link>
                   </CardContent>
                 </CardActionArea>
               </Card>
