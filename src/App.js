@@ -1,7 +1,6 @@
 import React, { Suspense } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { CircularProgress } from "@mui/material";
-// import MyCourses from "./pages/Student/MyCourses";
 
 const Home = React.lazy(() => import("./pages/Home"));
 const Login = React.lazy(() => import("./pages/Login"));
@@ -10,6 +9,8 @@ const InstructorDashboard = React.lazy(() => import("./pages/Instructor/Instruct
 const InstructorCourses = React.lazy(() => import("./pages/Instructor/InstructorCourses"));
 const StudentCourses = React.lazy(() => import("./pages/Student/MyCourses"));
 const CourseForm = React.lazy(() => import("./pages/Instructor/CourseForm"));
+const SectionForm = React.lazy(() => import("./pages/Instructor/SectionForm"));
+const LessonForm = React.lazy(() => import("./pages/Instructor/LessonForm"));
 const CourseListing = React.lazy(() => import("./pages/CourseListing"));
 const CourseDetails = React.lazy(() => import("./pages/CourseDetails"));
 
@@ -26,6 +27,8 @@ const App = () => (
         <Route path="/instructor/courses" element={<InstructorCourses />}/>
         <Route path="/Student/MyCourses" element={<StudentCourses />}/>
         <Route path="/instructor/course/new" element={<CourseForm />}/>
+        <Route path="/instructor/section/new" element={<SectionForm />}/>
+        <Route path="/instructor/lesson/new" element={<LessonForm />}/>
         <Route path="/instructor/course/:id/edit" element={<CourseForm />}/>
       </Routes>
     </Suspense>
