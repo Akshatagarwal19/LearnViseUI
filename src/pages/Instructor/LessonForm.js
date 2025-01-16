@@ -1,24 +1,22 @@
 import React, { useState } from "react";
 import { TextField, Button, Box, Typography } from "@mui/material";
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import courseApi from "../../services/apiService";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 
-const LessonForm = ({ courseId: propCourseId, sectionId: propSectionId }) => {
+const LessonForm = ({ courseId: propCourseId }) => {
   const [searchParams] = useSearchParams();
   const courseId = propCourseId || searchParams.get("courseId");
-  const sectionId = propSectionId || searchParams.get("sectionId");
 
   const [form, setForm] = useState({
     title: "",
     description: "",
-    price: "",
-    video: null,
+    duration: "",
+    file: null,
   });
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -26,7 +24,20 @@ const LessonForm = ({ courseId: propCourseId, sectionId: propSectionId }) => {
   };
 
   const handleFileChange = (e) => {
-    setForm({ ...form, video: e.target.files[0] });
+    const file = e.target.files[0];
+    if (file) {
+      setForm({ 
+        ...form, 
+        file,
+        contentType: file.type.startsWith("video/")
+          ? "video"
+          : file.type.includes("pdf")
+          ? "pdf"
+          : file.type.includes("excel") || file.type.includes("spreadsheet")
+          ? "excel"
+          : "unknown",
+      });
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -37,25 +48,20 @@ const LessonForm = ({ courseId: propCourseId, sectionId: propSectionId }) => {
     const formData = new FormData();
     formData.append("title", form.title);
     formData.append("description", form.description);
-    if (form.price) formData.append("price", parseFloat(form.price)); // Ensure price is sent as a number
-    if (form.video) formData.append("video", form.video);
+    formData.append("duration", form.duration);
+    if (form.file) formData.append("file", form.file);
+    if (form.contentType) formData.append("contentType", form.contentType);
 
     try {
-      const response = await courseApi.addLesson(courseId, sectionId, formData); // Ensure courseId and sectionId are passed
-      const lessonId = response.data?.lesson?.id;
-
+      const response = await courseApi.addLesson(courseId, formData);
       setSuccess("Lesson created successfully!");
       console.log("Response:", response.data);
 
       // Clear form fields after successful submission
-      setForm({ title: "", description: "", price: "", video: null });
+      setForm({ title: "", description: "", duration: "", file: null });
     } catch (err) {
       setError(err.response?.data?.message || "Failed to create lesson");
     }
-  };
-
-  const handleAddNewSection = () => {
-    navigate(`/instructor/section/new?courseId=${courseId}`);
   };
 
   return (
@@ -95,26 +101,31 @@ const LessonForm = ({ courseId: propCourseId, sectionId: propSectionId }) => {
           required
         />
         <TextField
-          label="Price"
-          name="price"
-          type="number"
-          value={form.price}
+          label="Duration (HH:MM:SS)"
+          name="duration"
+          value={form.duration}
           onChange={handleChange}
+          required
         />
         <Button variant="outlined" component="label">
-          Upload Video
-          <input type="file" accept="video/*" hidden onChange={handleFileChange} />
+          Upload File
+          <input
+            type="file"
+            accept="video/*,application/pdf,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            hidden
+            onChange={handleFileChange}
+          />
         </Button>
+        {form.file && (
+          <Typography variant="body2" color="textSecondary">
+            Selected File: {form.file.name}
+          </Typography>
+        )}
         {error && <Typography color="error">{error}</Typography>}
         {success && <Typography color="success.main">{success}</Typography>}
         <Button variant="contained" type="submit">
           Submit
         </Button>
-        <Box sx={{ display: "flex", justifyContent: "center", marginTop: 2 }}>
-          <Button variant="outlined" onClick={handleAddNewSection}>
-            Add New Section
-          </Button>
-        </Box>
       </Box>
       <Footer />
     </>

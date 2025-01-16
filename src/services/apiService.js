@@ -43,13 +43,8 @@ const courseApi = {
     return response;
   },
 
-  addSection: async (courseId, sectionData) => {
-    const response = await axiosInstance.post(`/courses/${courseId}/sections`, sectionData);
-    return response;
-  },
-
-  addLesson: async (courseId, sectionId, lessonData) => {
-    const response = await axiosInstance.post(`/courses/${courseId}/sections/${sectionId}/lessons`, lessonData);
+  addLesson: async (courseId, lessonData) => {
+    const response = await axiosInstance.post(`/courses/${courseId}/lessons`, lessonData);
     return response;
   },
 
@@ -104,11 +99,51 @@ const courseApi = {
 
   getCourseById: async (courseId) => {
     try {
-      const response = await axiosInstance.get(`/courses/${courseId}`);
+      const response = await axiosInstance.get(`http://localhost:3001/api/courses/${courseId}`);
       return response.data;
     } catch (error) {
       console.error('Error fetching course:', error.response?.data || error.message);
       throw new Error('Failed to fetch course');
+    }
+  },
+
+  updateCourse: async (courseId, courseData) => {
+    try {
+      const response = await axiosInstance.put(`/courses/${courseId}`, courseData);
+      return response.data;
+    } catch (error) {
+      console.error('Error updating course:', error.response?.data || error.message);
+      throw new Error('Failed to update course');
+    }
+  },
+
+  deleteCourse: async (courseId) => {
+    try {
+      const response = await axiosInstance.delete(`/courses/${courseId}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error deleting course:', error.response?.data || error.message);
+      throw new Error('Failed to delete course');
+    }
+  },
+
+  updateLesson: async (courseId, sectionId, lessonId, lessonData) => {
+    try {
+      const response = await axiosInstance.put(`/courses/${courseId}/lessons/${lessonId}`, lessonData);
+      return response.data;
+    } catch (error) {
+      console.error('Error updating lesson:', error.response?.data || error.message);
+      throw new Error('Failed to update lesson');
+    }
+  },
+
+  deleteLesson: async (courseId, sectionId, lessonId) => {
+    try {
+      const response = await axiosInstance.delete(`/courses/${courseId}/sections/${sectionId}/lessons/${lessonId}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error deleting lesson:', error.response?.data || error.message);
+      throw new Error('Failed to delete lesson');
     }
   },
 
@@ -119,6 +154,16 @@ const courseApi = {
     } catch (error) {
       console.error('Error during logout:', error.response?.data || error.message);
       throw new Error('Failed to log out');
+    }
+  },
+
+  updateLessonStatus: async (courseId, sectionId, lessonId, isFree) => {
+    try {
+      const response = await axiosInstance.patch(`http://localhost:3001/api/courses/${courseId}/sections/${sectionId}/lessons/${lessonId}`,{isFree});
+      return response.data;
+    } catch (error) {
+      console.error('Error updating Lesson status:', error.response?.data || error.message);
+      throw new Error('Failed to update lesson status');
     }
   },
 };

@@ -3,8 +3,8 @@ import { TextField, Button, Box, Typography, MenuItem, Select, FormControl, Inpu
 import courseApi from "../../services/apiService";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
-import SectionForm from "./SectionForm";
 import { useNavigate } from "react-router-dom";
+import LessonForm from "./LessonForm";
 
 const categories = [
   "WebDevelopment",
@@ -18,15 +18,7 @@ const categories = [
 const levels = ["Beginner", "Intermediate", "Advanced"];
 
 const CoursePage = () => {
-  const [form, setForm] = useState({
-    title: "",
-    description: "",
-    price: "",
-    language: "",
-    level: "",
-    category: "",
-    thumbnail: null,
-  });
+  const [form, setForm] = useState({ title: "", description: "", price: "", language: "", level: "", category: "", thumbnail: null });
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [courseId, setCourseId] = useState(null);
@@ -72,33 +64,12 @@ const CoursePage = () => {
   return (
     <>
       <Navbar />
-      <Box
-        component="form"
-        onSubmit={handleSubmit}
-        sx={{
-          maxWidth: 600,
-          margin: "auto",
-          display: "flex",
-          flexDirection: "column",
-          gap: 2,
-          padding: 2,
-          boxShadow: 3,
-          borderRadius: 2,
-        }}
-      >
+      <Box component="form" onSubmit={handleSubmit} sx={{ maxWidth: 600, margin: "auto", display: "flex", flexDirection: "column", gap: 2, padding: 2, boxShadow: 3, borderRadius: 2 }} >
         <Typography variant="h4" gutterBottom>
           Create a New Course
         </Typography>
         <TextField label="Title" name="title" value={form.title} onChange={handleChange} required />
-        <TextField
-          label="Description"
-          name="description"
-          value={form.description}
-          onChange={handleChange}
-          multiline
-          rows={4}
-          required
-        />
+        <TextField label="Description" name="description" value={form.description} onChange={handleChange} multiline rows={4} required />
         <TextField label="Price" name="price" type="number" value={form.price} onChange={handleChange} required />
         <TextField label="Language" name="language" value={form.language} onChange={handleChange} required />
         <FormControl fullWidth required>
@@ -129,13 +100,8 @@ const CoursePage = () => {
         {success && (
           <Typography color="success.main">
             {success}
-            <Button
-              variant="outlined"
-              color="primary"
-              sx={{ marginLeft: 2 }}
-              onClick={() => navigate(`/instructor/section/new?courseId=${courseId}`)}
-            >
-              Add Sections
+            <Button variant="outlined" color="primary" sx={{ marginLeft: 2 }} onClick={() => navigate(`/instructor/lesson/new?courseId=${courseId}`)} >
+              Add Lesson
             </Button>
           </Typography>
         )}
@@ -143,7 +109,7 @@ const CoursePage = () => {
           Submit
         </Button>
       </Box>
-      {courseId && <SectionForm courseId={courseId} />}
+      {courseId && <LessonForm courseId={courseId} />}
       <Footer />
     </>
   );
