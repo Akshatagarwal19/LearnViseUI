@@ -18,7 +18,7 @@ import Footer from "../../components/Footer";
 import courseApi from "../../services/apiService";
 import { jwtDecode } from "jwt-decode";
 import AddIcon from "@mui/icons-material/Add";
-// import bg2 from '../../../public/bg2.webp'
+
 
 const CourseCard = ({ course, onManage }) => (
   <Card
@@ -109,7 +109,7 @@ const InstructorDashboard = () => {
   };
 
   const handleManageCourse = (courseId) => {
-    navigate(`/instructor/course/manage/${courseId}`);
+    navigate(`/instructor/ManageCourses/${courseId}`);
   };
 
   return (

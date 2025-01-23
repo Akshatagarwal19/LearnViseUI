@@ -4,13 +4,14 @@ import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { logout } from "../redux/slices/authSlice";
+import { jwtDecode } from "jwt-decode";
 import courseApi from "../services/apiService"; // Assuming you have an API service for making requests
 
 const Navbar = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { isAuthenticated, user } = useSelector((state) => state.auth);
-
+  
   const [anchorE1, setAnchorE1] = React.useState(null);
   const open = Boolean(anchorE1);
 
@@ -36,10 +37,31 @@ const Navbar = () => {
     }
   };
 
+  const handleMyCoursesClick = () => {
+    const token = document.cookie
+      .split("; ")
+      .find((row) => row.startsWith("authToken=")) // Updated to 'authToken'
+      ?.split("=")[1];
+
+    if (!token) {
+      console.error("Token not found in document.cookie:", document.cookie);
+      throw new Error("No token found in cookies.");
+    }
+
+    // Decode token and proceed
+    const decoded = jwtDecode(token);
+    const { username, role } = decoded;
+    if (role === "Instructor") {
+      navigate("/instructor/dashboard");
+    } else {
+      navigate("/student/mycourses");
+    }
+  };
+
   return (
     <AppBar position="static" sx={{ marginBottom: 1 }}>
       <Toolbar>
-        <Typography variant="h6" sx={{ flexGrow: 1, cursor: "pointer", fontWeight: 700, fontSize: "1.8rem" }} onClick={() => navigate("/")} >
+        <Typography variant="h6" sx={{ flexGrow: 1, cursor: "pointer", fontWeight: 700, fontSize: "1.8rem" }} onClick={handleMyCoursesClick} >
           LearnVise
         </Typography>
 
@@ -49,7 +71,7 @@ const Navbar = () => {
 
         <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
           {isAuthenticated && (
-            <Button color="inherit" onClick={() => navigate("/Student/MyCourses")} sx={{ fontSize: "1rem", fontWeight: 600, padding: "8px 16px","&:hover": { backgroundColor: "rgba(255, 255, 255, 0.2)",} }} >
+            <Button color="inherit" onClick={handleMyCoursesClick} sx={{ fontSize: "1rem", fontWeight: 600, padding: "8px 16px","&:hover": { backgroundColor: "rgba(255, 255, 255, 0.2)",} }} >
               My Courses
             </Button>
           )}
@@ -74,7 +96,7 @@ const Navbar = () => {
               <Button color="inherit" onClick={() => navigate("/login")} sx={{ fontWeight: 600 }}>
                 Login
               </Button>
-              <Button variant="contained" color="secondary" onClick={() => navigate("/signup")} sx={{ fontWeight: 600, padding: "8px 16px", "&:hover": {backgroundColor: "&ff4081"},}}>
+              <Button variant="contained" color="secondary" onClick={() => navigate("/signup")} sx={{ fontWeight: 600, padding: "8px 16px", "&:hover": {backgroundColor: "ff4081"},}}>
                 SignUp
               </Button>
             </>

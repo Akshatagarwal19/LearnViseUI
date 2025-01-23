@@ -6,7 +6,9 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { fetchCourses, updateEnrolledCourse, checkEnrollmentStatus } from "../redux/slices/coursesSlice";
 import courseApi from "../services/apiService";
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+
+
 
 const getUsernameFromToken = () => {
   const token = document.cookie
@@ -58,13 +60,17 @@ const Homepage = () => {
     };
     fetchData();
   }, [dispatch, status]);
-
+  const navigate = useNavigate();
   const handleEnroll = async (courseId) => {
+    
     try {
       const response = await courseApi.enrollCourse(courseId);
       if (response) {
         alert("Enrolled Successfully");
         dispatch(updateEnrolledCourse(courseId));
+        navigate(`/course/${courseId}/Material`)
+      } else {
+        console.error("Enrollment failed:", response.data);
       }
     } catch (error) {
       console.error("Error enrolling in course:", error.message);

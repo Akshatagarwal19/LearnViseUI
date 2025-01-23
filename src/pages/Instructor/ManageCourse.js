@@ -44,48 +44,20 @@ const ManageCoursePage = () => {
     fetchCourseDetails();
   }, [courseId]);
 
-  const handleAddSection = () => {
-    navigate(`/instructor/section/new?courseId=${courseId}`);
-  };
-
-  const handleAddLesson = (sectionId) => {
-    navigate(`/instructor/lesson/new?courseId=${courseId}&sectionId=${sectionId}`);
-  };
-
-  const handleEditSection = (sectionId) => {
-    navigate(`/instructor/section/edit?courseId=${courseId}&sectionId=${sectionId}`);
+  const handleAddLesson = () => {
+    navigate(`/instructor/lesson/new?courseId=${courseId}`);
   };
 
   const handleEditLesson = (lessonId) => {
     navigate(`/instructor/lesson/edit?courseId=${courseId}&lessonId=${lessonId}`);
   };
 
-  const handleDeleteSection = async (sectionId) => {
+  const handleDeleteLesson = async (lessonId) => {
     try {
-      await courseApi.deleteSection(courseId, sectionId);
+      await courseApi.deleteLesson(courseId, lessonId);
       setCourseData((prevData) => ({
         ...prevData,
-        sections: prevData.sections.filter((section) => section._id !== sectionId),
-      }));
-    } catch (err) {
-      console.error("Error deleting section:", err);
-      alert("Failed to delete section.");
-    }
-  };
-
-  const handleDeleteLesson = async (sectionId, lessonId) => {
-    try {
-      await courseApi.deleteLesson(courseId, sectionId, lessonId);
-      setCourseData((prevData) => ({
-        ...prevData,
-        sections: prevData.sections.map((section) =>
-          section._id === sectionId
-            ? {
-                ...section,
-                lessons: section.lessons.filter((lesson) => lesson._id !== lessonId),
-              }
-            : section
-        ),
+        lessons: prevData.lessons.filter((lesson) => lesson._id !== lessonId),
       }));
     } catch (err) {
       console.error("Error deleting lesson:", err);
@@ -93,22 +65,14 @@ const ManageCoursePage = () => {
     }
   };
 
-  const handleToggleIsFree = async (sectionId, lessonId, isFree) => {
+  const handleToggleIsFree = async (lessonId, isFree) => {
     try {
-      await courseApi.updateLessonStatus(courseId, sectionId, lessonId, isFree);
+      await courseApi.updateLessonStatus(courseId, lessonId, isFree);
       setCourseData((prevData) => {
-        const updatedSections = prevData.sections.map((section) => {
-          if (section._id === sectionId) {
-            return {
-              ...section,
-              lessons: section.lessons.map((lesson) =>
-                lesson._id === lessonId ? { ...lesson, isFree } : lesson
-              ),
-            };
-          }
-          return section;
-        });
-        return { ...prevData, sections: updatedSections };
+        const updatedLessons = prevData.lessons.map((lesson) =>
+          lesson._id === lessonId ? { ...lesson, isFree } : lesson
+        );
+        return { ...prevData, lessons: updatedLessons };
       });
     } catch (err) {
       console.error("Error updating lesson free/paid status:", err);
@@ -143,130 +107,82 @@ const ManageCoursePage = () => {
       <Button
         variant="contained"
         color="primary"
-        onClick={handleAddSection}
+        onClick={handleAddLesson}
         sx={{ mb: 3 }}
       >
-        Add New Section
-      </Button>
-      <Button
-        variant="contained"
-        color="secondary"
-        
-        sx={{ mb: 3 }}
-      >
-        Update Course
+        Add Lesson
       </Button>
 
-      {courseData?.sections?.length > 0 ? (
+      {courseData?.lessons?.length > 0 ? (
         <List>
-          {courseData.sections.map((section) => (
-            <Box key={section._id} sx={{ mb: 3 }}>
-              <Typography variant="h6">{section.title}</Typography>
-              <Tooltip title={section.description || ""}>
-                <Typography
-                  variant="body2"
-                  color="textSecondary"
-                  sx={{
-                    maxWidth: "400px",
-                    whiteSpace: "nowrap",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                  }}
+          {courseData.lessons.map((lesson) => (
+            <ListItem key={lesson._id} sx={{ pl: 4 }}>
+              <ListItemText
+                primary={lesson.title}
+                secondary={
+                  <Tooltip title={lesson.description || ""}>
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        maxWidth: "300px",
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                      }}
+                    >
+                      {lesson.description}
+                    </Typography>
+                  </Tooltip>
+                }
+              />
+              <ListItemSecondaryAction>
+                <RadioGroup
+                  row
+                  value={lesson.isFree ? "free" : "paid"}
+                  onChange={(e) =>
+                    handleToggleIsFree(
+                      lesson._id,
+                      e.target.value === "free"
+                    )
+                  }
                 >
-                  {section.description}
-                </Typography>
-              </Tooltip>
-              <Box sx={{ display: "flex", gap: 2, mt: 1 }}>
+                  <FormControlLabel
+                    value="free"
+                    control={<Radio />}
+                    label="Free"
+                  />
+                  <FormControlLabel
+                    value="paid"
+                    control={<Radio />}
+                    label="Paid"
+                  />
+                </RadioGroup>
                 <Button
                   variant="outlined"
                   color="primary"
-                  onClick={() => handleEditSection(section._id)}
+                  onClick={() => navigate(`/quiz/create/new?lessonId=${lesson._id}`)}
+                  sx={{ marginRight: 2 }}
                 >
-                  Edit Section
+                  Create Quiz
                 </Button>
-                <Button
-                  variant="outlined"
+                <IconButton
+                  color="primary"
+                  onClick={() => handleEditLesson(lesson._id)}
+                >
+                  <EditIcon />
+                </IconButton>
+                <IconButton
                   color="error"
-                  onClick={() => handleDeleteSection(section._id)}
-                  startIcon={<DeleteIcon />}
+                  onClick={() => handleDeleteLesson(lesson._id)}
                 >
-                  Delete Section
-                </Button>
-                <Button
-                  variant="contained"
-                  color="secondary"
-                  onClick={() => handleAddLesson(section._id)}
-                >
-                  Add Lesson
-                </Button>
-              </Box>
-              {section.lessons.length > 0 && (
-                <List>
-                  {section.lessons.map((lesson) => (
-                    <ListItem key={lesson._id} sx={{ pl: 4 }}>
-                      <ListItemText
-                        primary={lesson.title}
-                        secondary={
-                          <Tooltip title={lesson.description || ""}>
-                            <Typography
-                              variant="body2"
-                              sx={{
-                                maxWidth: "300px",
-                                whiteSpace: "nowrap",
-                                overflow: "hidden",
-                                textOverflow: "ellipsis",
-                              }}
-                            >
-                              {lesson.description}
-                            </Typography>
-                          </Tooltip>
-                        }
-                      />
-                      <ListItemSecondaryAction>
-                        <RadioGroup
-                          row
-                          value={lesson.isFree ? "free" : "paid"}
-                          onChange={(e) =>
-                            handleToggleIsFree(
-                              section._id,
-                              lesson._id,
-                              e.target.value === "free"
-                            )
-                          }
-                        >
-                          <FormControlLabel
-                            value="free"
-                            control={<Radio />}
-                            label="Free"
-                          />
-                          <FormControlLabel
-                            value="paid"
-                            control={<Radio />}
-                            label="Paid"
-                          />
-                        </RadioGroup>
-                        <IconButton
-                          color="primary"
-                          onClick={() => handleEditLesson(lesson._id)}
-                        >
-                          <EditIcon />
-                        </IconButton>
-                        <IconButton
-                          color="error"
-                          onClick={() => handleDeleteLesson(section._id, lesson._id)}
-                        >
-                          <DeleteIcon />
-                        </IconButton>
-                      </ListItemSecondaryAction>
-                    </ListItem>
-                  ))}
-                </List>
-              )}
-            </Box>
+                  <DeleteIcon />
+                </IconButton>
+              </ListItemSecondaryAction>
+            </ListItem>
           ))}
         </List>
       ) : (
-        <Typography>No sections available.</Typography>
+        <Typography>No lessons available.</Typography>
       )}
 
       <Footer />

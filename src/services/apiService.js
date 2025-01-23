@@ -48,6 +48,20 @@ const courseApi = {
     return response;
   },
 
+  createQuiz: async ({ lessonId, quizData }) => {
+    console.log('Lesson ID:', lessonId);
+    console.log('Quiz Data:', quizData);
+  
+    try {
+      const response = await axiosInstance.post(`/Quiz/lessons/${lessonId}/quiz`, quizData);
+      return response.data;
+    } catch (error) {
+      console.error('Error creating quiz:', error.response?.data || error.message);
+      throw new Error('Failed to create quiz');
+    }
+  },
+   
+
   getAllCourses: async () => {
     try {
       const response = await axios.get("http://localhost:3001/api/courses");
@@ -144,6 +158,26 @@ const courseApi = {
     } catch (error) {
       console.error('Error deleting lesson:', error.response?.data || error.message);
       throw new Error('Failed to delete lesson');
+    }
+  },
+
+  markLessonCompleted: async (courseId, lessonId) => {
+    try{
+      const response = await axiosInstance.post(`/api/progress/${courseId}/lessons/${lessonId}/complete`);
+      return response.data;
+    } catch (error) {
+      console.error(`Error marking lesson as completed:`, error.response?.data || error.message);
+      throw new Error("Failed to mark lesson as completed");
+    }
+  },
+
+  getCourseProgress: async (courseId) => {
+    try {
+      const response = await axiosInstance.get(`/api/progress/${courseId}/progress`);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching course progress:", error.response?.data || error.message);
+      throw new Error("Failed to get Course Progress");
     }
   },
 
