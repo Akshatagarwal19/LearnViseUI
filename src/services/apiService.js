@@ -38,6 +38,17 @@ axiosInstance.interceptors.response.use(
 );
 
 const courseApi = {
+
+  logout: async () => {
+    try {
+      const response = await axiosInstance.post('/auth/logout'); // Adjust endpoint as needed
+      return response;
+    } catch (error) {
+      console.error('Error during logout:', error.response?.data || error.message);
+      throw new Error('Failed to log out');
+    }
+  },
+  
   createCourse: async (courseData) => {
     const response = await axiosInstance.post('/courses', courseData);
     return response;
@@ -48,66 +59,12 @@ const courseApi = {
     return response;
   },
 
-  createQuiz: async ({ lessonId, quizData }) => {
-    console.log('Lesson ID:', lessonId);
-    console.log('Quiz Data:', quizData);
-  
-    try {
-      const response = await axiosInstance.post(`/Quiz/lessons/${lessonId}/quiz`, quizData);
-      return response.data;
-    } catch (error) {
-      console.error('Error creating quiz:', error.response?.data || error.message);
-      throw new Error('Failed to create quiz');
-    }
-  },
-   
-
   getAllCourses: async () => {
     try {
       const response = await axios.get("http://localhost:3001/api/courses");
       return response.data.courses;  // Return only the courses part of the response
     } catch (err) {
       throw new Error("Failed to fetch courses: " + err.message);
-    }
-  },
-
-  getEnrolledCourses: async () => {
-    try {
-      const response = await axiosInstance.get('http://localhost:3001/api/enrollment/details');
-      return response.data.enrollments;
-    } catch (error) {
-      console.error("Error fetching enrolled courses:", error.response?.data || error.message);
-      throw new Error("Failed to fetch enrolled courses: " + error.message);
-    }
-  },
-
-  checkEnrollmentStatus: async (courseId) => {
-    try {
-      const response = await axiosInstance.get(`http://localhost:3001/api/enrollment/check-status/${courseId}`);
-      return response.data;
-    } catch (error) {
-      console.error('Error checking enrollment status:', error);
-      throw error;
-    }
-  },
-
-  enrollCourse: async (courseId) => {
-    try {
-      const response = await axiosInstance.post(`/enrollment/enroll/${courseId}`);
-      return response.data;
-    } catch (error) {
-      console.error("Error enrolling in course", error.response?.data || error.message);
-      throw new Error("Failed to enroll in course");
-    }
-  },
-
-  getEnrollments: async () => {
-    try {
-      const response = await axiosInstance.get('/enrollment');
-      return response.data.enrollments;
-    } catch (error) {
-      console.error('Error fetching enrollments:', error.response?.data || error.message);
-      throw new Error('Failed to fetch enrollments');
     }
   },
 
@@ -161,19 +118,43 @@ const courseApi = {
     }
   },
 
-  markLessonCompleted: async (courseId, lessonId) => {
-    try{
-      const response = await axiosInstance.post(`/api/progress/${courseId}/lessons/${lessonId}/complete`);
+  // isfreestatus api
+  updateLessonStatus: async (courseId, lessonId, isFree) => {
+    try {
+      const response = await axiosInstance.patch(`http://localhost:3001/api/courses/${courseId}/lessons/${lessonId}`,{isFree});
       return response.data;
     } catch (error) {
-      console.error(`Error marking lesson as completed:`, error.response?.data || error.message);
-      throw new Error("Failed to mark lesson as completed");
+      console.error('Error updating Lesson status:', error.response?.data || error.message);
+      throw new Error('Failed to update lesson status');
+    }
+  },
+
+  createQuiz: async ({ lessonId, quizData }) => {
+    console.log('Lesson ID:', lessonId);
+    console.log('Quiz Data:', quizData);
+  
+    try {
+      const response = await axiosInstance.post(`/Quiz/lessons/${lessonId}/quiz`, quizData);
+      return response.data;
+    } catch (error) {
+      console.error('Error creating quiz:', error.response?.data || error.message);
+      throw new Error('Failed to create quiz');
+    }
+  },
+
+  markLessonCompleted: async (courseId, lessonId, payload) => {
+    try {
+        const response = await axiosInstance.post(`/progress/${courseId}/lessons/${lessonId}/complete`, payload);
+        return response.data;
+    } catch (error) {
+        console.error("Error marking lesson as completed:", error.response?.data || error.message);
+        throw new Error("Failed to mark lesson as completed");
     }
   },
 
   getCourseProgress: async (courseId) => {
     try {
-      const response = await axiosInstance.get(`/api/progress/${courseId}/progress`);
+      const response = await axiosInstance.get(`/progress/${courseId}/progress`);
       return response.data;
     } catch (error) {
       console.error("Error fetching course progress:", error.response?.data || error.message);
@@ -181,25 +162,48 @@ const courseApi = {
     }
   },
 
-  logout: async () => {
+  enrollCourse: async (courseId) => {
     try {
-      const response = await axiosInstance.post('/auth/logout'); // Adjust endpoint as needed
-      return response;
+      const response = await axiosInstance.post(`/enrollment/enroll/${courseId}`);
+      return response.data;
     } catch (error) {
-      console.error('Error during logout:', error.response?.data || error.message);
-      throw new Error('Failed to log out');
+      console.error("Error enrolling in course", error.response?.data || error.message);
+      throw new Error("Failed to enroll in course");
     }
   },
 
-  updateLessonStatus: async (courseId, sectionId, lessonId, isFree) => {
+  getEnrolledCourses: async () => {
     try {
-      const response = await axiosInstance.patch(`http://localhost:3001/api/courses/${courseId}/sections/${sectionId}/lessons/${lessonId}`,{isFree});
-      return response.data;
+      const response = await axiosInstance.get('http://localhost:3001/api/enrollment/details');
+      return response.data.enrollments;
     } catch (error) {
-      console.error('Error updating Lesson status:', error.response?.data || error.message);
-      throw new Error('Failed to update lesson status');
+      console.error("Error fetching enrolled courses:", error.response?.data || error.message);
+      throw new Error("Failed to fetch enrolled courses: " + error.message);
     }
   },
+
+  checkEnrollmentStatus: async (courseId) => {
+    try {
+      const response = await axiosInstance.get(`http://localhost:3001/api/enrollment/check-status/${courseId}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error checking enrollment status:', error);
+      throw error;
+    }
+  },  
+
+  getEnrollments: async () => {
+    try {
+      const response = await axiosInstance.get('/enrollment');
+      return response.data.enrollments;
+    } catch (error) {
+      console.error('Error fetching enrollments:', error.response?.data || error.message);
+      throw new Error('Failed to fetch enrollments');
+    }
+  },
+
+  
+
 };
 
 export default courseApi;

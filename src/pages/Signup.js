@@ -2,11 +2,13 @@ import React, { useState } from "react";
 import { Container, Box, Typography, TextField, Button, CircularProgress } from "@mui/material";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import axios from "axios";
 
 const Signup = () => {
   const [form, setForm] = useState({ username: "", email: "", password: "" });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -16,11 +18,21 @@ const Signup = () => {
     e.preventDefault();
     setLoading(true);
     setError("");
+    setSuccess("");
+
     try {
-      // Handle signup API call here
-      console.log("Signing up with:", form);
+      const response = await axios.post("http://localhost:3001/api/auth/signup", form, {
+        headers: { "Content-Type": "application/json" },
+      });
+
+      if (response.status === 201) {
+        setSuccess("Signup successful! Please log in.");
+        setForm({ username: "", email: "", password: "" });
+      } else {
+        setError("Unexpected response from the server.");
+      }
     } catch (err) {
-      setError("Signup failed. Try again.");
+      setError(err.response?.data?.message || "Signup failed. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -74,6 +86,11 @@ const Signup = () => {
             {error && (
               <Typography color="error" align="center">
                 {error}
+              </Typography>
+            )}
+            {success && (
+              <Typography color="success.main" align="center">
+                {success}
               </Typography>
             )}
             <Button
