@@ -3,24 +3,14 @@ import { useParams } from 'react-router-dom';
 import courseApi from '../services/apiService';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import {
-  Button,
-  Typography,
-  Card,
-  CircularProgress,
-  Container,
-  Box,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-} from '@mui/material';
+import { Button, Typography, Card, CircularProgress, Container, Box } from '@mui/material';
 import PlayCircleIcon from '@mui/icons-material/PlayCircle';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+// import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import StarIcon from '@mui/icons-material/Star';
 
 const CourseDetails = () => {
   const { id } = useParams();
-  const [courseData, setCourseData] = useState({ course: { sections: [] } });
+  const [courseData, setCourseData] = useState({});
   const [isEnrolled, setIsEnrolled] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -39,9 +29,9 @@ const CourseDetails = () => {
         setLoading(false);
       }
     };
-
     fetchCourseDetails();
   }, [id]);
+  
 
   const enrollInCourse = async () => {
     try {
@@ -75,15 +65,16 @@ const CourseDetails = () => {
 
   const renderLessons = (lessons) =>
     lessons
-      ?.filter((lesson) => isEnrolled || lesson.price === 0)
+      ?.filter((lesson) => isEnrolled || lesson.freeAccess)
       ?.map((lesson) => (
         <li key={lesson._id} style={{ marginBottom: '10px' }}>
           <PlayCircleIcon sx={{ marginRight: 1, verticalAlign: 'middle' }} />
           <a href={lesson.videoUrl} target="_blank" rel="noopener noreferrer">
-            {lesson.title} {lesson.price === 0 && <span style={{ color: '#28a745' }}>(Free)</span>}
+            {lesson.title} {lesson.freeAccess === 0 ? <span style={{ color: '#28a745' }}>(Free)</span> : null}
           </a>
         </li>
       ));
+  
 
   return (
     <>
@@ -102,14 +93,10 @@ const CourseDetails = () => {
               4.5 (1200 ratings)
             </Typography>
           </Box>
-          <Typography variant="body1" paragraph>
+          <Typography variant="body1" component="p">
             {courseData.course.description}
           </Typography>
-          <img
-            src={courseData.course.thumbnail}
-            alt={courseData.course.title}
-            style={{ width: '100%', borderRadius: '8px', marginBottom: '20px' }}
-          />
+          <img src={courseData.course.thumbnail} alt={courseData.course.title} style={{ width: '100%', borderRadius: '8px', marginBottom: '20px' }} />
         </Container>
       </Box>
       <Container>
@@ -117,30 +104,16 @@ const CourseDetails = () => {
           <Typography variant="h4" sx={{ fontWeight: 'bold', marginBottom: 2 }}>
             ${courseData.course.price}
           </Typography>
-          <Button
-            variant="contained"
-            color="primary"
-            fullWidth
-            sx={{ marginTop: 2 }}
-            onClick={enrollInCourse}
-            disabled={isEnrolled}
-          >
+          <Button variant="contained" color="primary" fullWidth sx={{ marginTop: 2 }} onClick={enrollInCourse} disabled={isEnrolled} >
             {isEnrolled ? 'Enrolled' : 'Enroll Now'}
           </Button>
         </Card>
         <Typography variant="h5" sx={{ marginTop: 4, marginBottom: 2 }}>
           {isEnrolled ? 'Course Content' : 'Free Lessons'}
         </Typography>
-        {courseData.course.sections.map((section) => (
-          <Accordion key={section._id}>
-            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-              <Typography variant="h6">{section.title}</Typography>
-            </AccordionSummary>
-            <AccordionDetails>
-              <ul style={{ listStyle: 'none', padding: 0 }}>{renderLessons(section.lessons)}</ul>
-            </AccordionDetails>
-          </Accordion>
-        ))}
+        <ul style={{ listStyle: 'none', padding: 0 }}>
+          {renderLessons(courseData.course.lessons)}
+        </ul>
       </Container>
       <Footer />
     </>

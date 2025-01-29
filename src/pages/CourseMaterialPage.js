@@ -16,27 +16,25 @@ const CourseMaterialsPage = () => {
     const [showQuiz, setShowQuiz] = useState(false);
     const [quizContent, setQuizContent] = useState(null);
     const [loading, setLoading] = useState(false);
-
+    const [certificateUrl, setCertificateUrl] = useState(null);
 
     useEffect(() => {
         const fetchCourseDetails = async () => {
           try {
             const courseResponse = await courseApi.getCourseById(id);
-            console.log("Course Details Response:", courseResponse);
-      
             const fetchedCourseData = courseResponse.course;
             setCourseData(fetchedCourseData);
             
             if (!fetchedCourseData) {
               throw new Error("Course data is missing in the response");
             }
-            
             // Use fetchedCourseData instead of courseData
             if (fetchedCourseData.lessons && fetchedCourseData.lessons.length > 0) {
               setCurrentLesson(fetchedCourseData.lessons[0]);
               console.log("Initial currentLesson set to:", fetchedCourseData.lessons[0]);
             } else {
               console.warn("No lessons available for this course");
+              setCurrentLesson(null);
             }
       
             const progressResponse = await courseApi.getCourseProgress(id);
@@ -53,6 +51,24 @@ const CourseMaterialsPage = () => {
       
         fetchCourseDetails();
       }, [id]); // Remove courseData from dependencies
+
+      const generateCertificate = async () => {
+        try {
+            setLoading(true);
+            const response = await courseApi.generateCertificate(id, "currentUserId"); // Replace "currentUserId" with actual user ID
+            
+            if (response.success && response.downloadUrl) {
+                setCertificateUrl(response.downloadUrl);
+            } else {
+                throw new Error("Failed to generate certificate");
+            }
+        } catch (error) {
+            console.error("Error generating certificate:", error);
+            // Optionally, show an error message to the user
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const fetchQuizContent = async (lessonId) => {
         if (!lessonId) {
@@ -202,6 +218,31 @@ const CourseMaterialsPage = () => {
                 value={progressData.progressPercentage}
               />
             </Box>
+
+            <Button
+              variant="contained"
+              onClick={generateCertificate}
+              disabled={progressData.progressPercentage < 100 || loading}
+              sx={{ marginBottom: 2, marginRight: 2 }}
+            >
+              Generate Certificate
+            </Button>
+            {certificateUrl && (
+              <Box sx={{ marginTop: 2 }}>
+                <Typography variant="body1" sx={{ marginBottom: 1 }}>
+                  Your certificate is ready!
+                </Typography>
+                <Button
+                  variant="contained"
+                  color="success"
+                  component="a"
+                  href={certificateUrl}
+                  download="Course_Certificate.pdf"
+                >
+                  Download Certificate
+                </Button>
+              </Box>
+            )}
 
             <Button
               variant="contained"

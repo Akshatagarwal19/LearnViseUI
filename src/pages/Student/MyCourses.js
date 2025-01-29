@@ -66,7 +66,7 @@ const MyCourses = () => {
                       variant="contained"
                       color="primary"
                       size="small"
-                      onClick={() => navigate(`/course/${course._id}`)}
+                      onClick={() => navigate(`/course/${course._id}/Material`)}
                       sx={{ mt: 2 }}
                     >
                       Go to Course

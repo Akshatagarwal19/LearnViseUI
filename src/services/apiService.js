@@ -162,6 +162,16 @@ const courseApi = {
     }
   },
 
+  generateCertificate: async (courseId) => {
+    try {
+        const response = await axiosInstance.post(`/certificate/${courseId}/generate`);
+        return response.data;
+    } catch (error) {
+        console.error("Error generating certificate:", error.response?.data || error.message);
+        throw new Error("Failed to generate Certificate");
+    }
+  },
+
   enrollCourse: async (courseId) => {
     try {
       const response = await axiosInstance.post(`/enrollment/enroll/${courseId}`);
