@@ -14,10 +14,7 @@ import { useSelector, useDispatch } from "react-redux";
 import {jwtDecode} from "jwt-decode";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import {
-  fetchCourses,
-  updateEnrolledCourse,
-} from "../redux/slices/coursesSlice";
+import { fetchCourses } from "../redux/slices/coursesSlice";
 import courseApi from "../services/apiService";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -227,7 +224,7 @@ const Homepage = () => {
                     <CardMedia
                       component="img"
                       height="200"
-                      image={course.thumbnail}
+                      image={`http://localhost:3001${course.thumbnail}`}
                       alt={course.title}
                     />
                     <CardContent>

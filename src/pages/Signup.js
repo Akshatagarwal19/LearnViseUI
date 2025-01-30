@@ -6,7 +6,7 @@ import axios from "axios";
 
 const Signup = () => {
   const [form, setForm] = useState({ username: "", email: "", password: "" });
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState({ primary: false, secondary: false });
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
@@ -14,14 +14,13 @@ const Signup = () => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
+  const handleSubmit = async (apiEndpoint, buttonType) => {
+    setLoading({ ...loading, [buttonType]: true });
     setError("");
     setSuccess("");
 
     try {
-      const response = await axios.post("http://localhost:3001/api/auth/signup", form, {
+      const response = await axios.post(apiEndpoint, form, {
         headers: { "Content-Type": "application/json" },
       });
 
@@ -34,7 +33,7 @@ const Signup = () => {
     } catch (err) {
       setError(err.response?.data?.message || "Signup failed. Please try again.");
     } finally {
-      setLoading(false);
+      setLoading({ ...loading, [buttonType]: false });
     }
   };
 
@@ -44,7 +43,7 @@ const Signup = () => {
       <Container maxWidth="sm" sx={{ minHeight: "70vh", display: "flex", alignItems: "center" }}>
         <Box
           component="form"
-          onSubmit={handleSubmit}
+          onSubmit={(e) => e.preventDefault()}
           sx={{
             width: "100%",
             boxShadow: 3,
@@ -96,12 +95,22 @@ const Signup = () => {
             <Button
               variant="contained"
               color="primary"
-              type="submit"
+              onClick={() => handleSubmit("http://localhost:3001/api/auth/signup", "primary")}
               fullWidth
               sx={{ padding: "1rem" }}
-              disabled={loading}
+              disabled={loading.primary || loading.secondary}
             >
-              {loading ? <CircularProgress size={24} color="inherit" /> : "Signup"}
+              {loading.primary ? <CircularProgress size={24} color="inherit" /> : "Signup Student"}
+            </Button>
+            <Button
+              variant="contained"
+              color="secondary"
+              onClick={() => handleSubmit("http://localhost:3001/api/auth/signup/Instructor", "secondary")}
+              fullWidth
+              sx={{ padding: "1rem" }}
+              disabled={loading.primary || loading.secondary}
+            >
+              {loading.secondary ? <CircularProgress size={24} color="inherit" /> : "Signup Instructor"}
             </Button>
           </Box>
         </Box>

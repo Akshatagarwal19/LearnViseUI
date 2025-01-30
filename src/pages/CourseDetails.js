@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import courseApi from '../services/apiService';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { Button, Typography, Card, CircularProgress, Container, Box } from '@mui/material';
 import PlayCircleIcon from '@mui/icons-material/PlayCircle';
-// import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import StarIcon from '@mui/icons-material/Star';
 
 const CourseDetails = () => {
@@ -32,19 +31,9 @@ const CourseDetails = () => {
     fetchCourseDetails();
   }, [id]);
   
-
+const navigate = useNavigate();
   const enrollInCourse = async () => {
-    try {
-      await courseApi.enrollCourse(id);
-      alert('Enrollment successful!');
-      setIsEnrolled(true);
-
-      const updatedCourse = await courseApi.getCourseById(id);
-      setCourseData(updatedCourse);
-    } catch (error) {
-      console.error('Error enrolling in course:', error);
-      alert('Failed to enroll in course.');
-    }
+    navigate(`/payment?courseId=${id}`);
   };
 
   if (loading) {
@@ -63,18 +52,35 @@ const CourseDetails = () => {
     );
   }
 
-  const renderLessons = (lessons) =>
-    lessons
-      ?.filter((lesson) => isEnrolled || lesson.freeAccess)
-      ?.map((lesson) => (
-        <li key={lesson._id} style={{ marginBottom: '10px' }}>
-          <PlayCircleIcon sx={{ marginRight: 1, verticalAlign: 'middle' }} />
-          <a href={lesson.videoUrl} target="_blank" rel="noopener noreferrer">
-            {lesson.title} {lesson.freeAccess === 0 ? <span style={{ color: '#28a745' }}>(Free)</span> : null}
-          </a>
-        </li>
-      ));
-  
+  const renderLessons = (lessons) => {
+    const accessibleLessons = isEnrolled 
+      ? lessons 
+      : lessons?.filter(lesson => lesson.isFree);
+    
+    return accessibleLessons?.map((lesson) => (
+      <li key={lesson._id} style={{ marginBottom: '10px' }}>
+        <PlayCircleIcon sx={{ marginRight: 1, verticalAlign: 'middle' }} />
+        {lesson.title}
+        {lesson.isFree && <span style={{ color: '#28a745', marginLeft: '8px' }}>(Free)</span>}
+      </li>
+    ));
+  };
+
+  if (loading) {
+    return (
+      <Container sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '80vh' }}>
+        <CircularProgress />
+      </Container>
+    );
+  }
+
+  if (!courseData?.course?.title) {
+    return (
+      <Typography variant="h6" sx={{ textAlign: 'center', marginTop: 2 }}>
+        Course not found.
+      </Typography>
+    );
+  }
 
   return (
     <>
@@ -96,7 +102,7 @@ const CourseDetails = () => {
           <Typography variant="body1" component="p">
             {courseData.course.description}
           </Typography>
-          <img src={courseData.course.thumbnail} alt={courseData.course.title} style={{ width: '100%', borderRadius: '8px', marginBottom: '20px' }} />
+          <img src={`http://localhost:3001${courseData.course.thumbnail}`} alt={courseData.course.title} style={{ width: '100%', borderRadius: '8px', marginBottom: '20px' }} />
         </Container>
       </Box>
       <Container>

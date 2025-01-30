@@ -27,7 +27,7 @@ const CourseCard = ({ course, onManage }) => (
     <CardMedia
       component="img"
       height="180"
-      image={course.thumbnail}
+      image={`http://localhost:3001${course.thumbnail}`}
       alt={course.title}
       sx={{ objectFit: "cover", borderBottom: "2px solid #e0e0e0" }}
     />

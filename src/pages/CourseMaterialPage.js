@@ -5,7 +5,6 @@ import courseApi from "../services/apiService";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import Quiz from "../components/Quiz/Quiz";
-import axiosInstance from '../services/apiService';
 
 
 const CourseMaterialsPage = () => {
@@ -28,7 +27,6 @@ const CourseMaterialsPage = () => {
             if (!fetchedCourseData) {
               throw new Error("Course data is missing in the response");
             }
-            // Use fetchedCourseData instead of courseData
             if (fetchedCourseData.lessons && fetchedCourseData.lessons.length > 0) {
               setCurrentLesson(fetchedCourseData.lessons[0]);
               console.log("Initial currentLesson set to:", fetchedCourseData.lessons[0]);
@@ -48,9 +46,8 @@ const CourseMaterialsPage = () => {
             console.error("Error fetching course details or progress:", error);
           }
         };
-      
         fetchCourseDetails();
-      }, [id]); // Remove courseData from dependencies
+      }, [id]);
 
       const generateCertificate = async () => {
         try {
@@ -64,7 +61,6 @@ const CourseMaterialsPage = () => {
             }
         } catch (error) {
             console.error("Error generating certificate:", error);
-            // Optionally, show an error message to the user
         } finally {
             setLoading(false);
         }
@@ -88,16 +84,11 @@ const CourseMaterialsPage = () => {
             }
         } catch (error) {
             console.error("Error fetching quiz:", error);
-            // You might want to show an error message to the user here
         }
     };
-
-     // Assuming this is where axiosInstance is defined
-
      const submitQuizAndComplete = async (lessonId, answers) => {
       try {
           console.log("Submitting quiz answers:", answers);
-  
           // Use courseApi to make the API call
           const response = await courseApi.markLessonCompleted(id, lessonId, { answers });
   
@@ -105,14 +96,9 @@ const CourseMaterialsPage = () => {
               // Update progress
               setProgressData((prev) => {
                   const completedLessons = [...prev.completedLessons, lessonId];
-                  const progressPercentage =
-                      (completedLessons.length / courseData.lessons.length) * 100;
+                  const progressPercentage = (completedLessons.length / courseData.lessons.length) * 100;
   
-                  return {
-                      ...prev,
-                      completedLessons,
-                      progressPercentage,
-                  };
+                  return { ...prev, completedLessons, progressPercentage };
               });
   
               setShowQuiz(false);
@@ -134,22 +120,31 @@ const CourseMaterialsPage = () => {
         }));
     };
 
-    const renderContent = () => {
-        if (!currentLesson) {
-            return <Typography variant="body1">No lesson selected.</Typography>;
-        }
+    const BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001'; // Set this dynamically based on your environment
 
-        switch (currentLesson.contentType) {
-            case "video":
-                return <video src={currentLesson.fileUrl} controls style={{ width: "100%" }} />;
-            case "pdf":
-                return <iframe src={currentLesson.fileUrl} title="Pdf Viewer" style={{ width: "100%", height: "600px" }} />;
-            case "excel":
-                return <iframe src={currentLesson.fileUrl} title="Excel Viewer" style={{ width: "100%", height: "600px" }} />;
-            default:
-                return <Typography>Unsupported File Type</Typography>;
-        }
-    };
+const renderContent = () => {
+    if (!currentLesson) {
+        return <Typography variant="body1">No lesson selected.</Typography>;
+    }
+
+    const fileUrl = `${BASE_URL}${currentLesson.fileUrl}`; // Dynamically set the full URL for the file
+
+    switch (currentLesson.contentType) {
+        case "video":
+          return (
+            <video controls style={{ width: "100%" }}>
+                <source src={fileUrl} type="video/mp4" />
+                Your browser does not support the video tag.
+            </video>
+        );
+        case "pdf":
+            return <iframe src={fileUrl} title="Pdf Viewer" style={{ width: "100%", height: "600px" }} />;
+        case "excel":
+            return <iframe src={fileUrl} title="Excel Viewer" style={{ width: "100%", height: "600px" }} />;
+        default:
+            return <Typography>Unsupported File Type</Typography>;
+    }
+};
 
     return (
       <>
@@ -181,13 +176,7 @@ const CourseMaterialsPage = () => {
                   {(progressData.completedLessons || []).includes(
                     lesson.id
                   ) && (
-                    <Box
-                      sx={{
-                        position: "absolute",
-                        right: "8px",
-                        color: "green",
-                      }}
-                    >
+                    <Box sx={{ position: "absolute", right: "8px", color: "green", }} >
                       ✓
                     </Box>
                   )}
@@ -213,18 +202,10 @@ const CourseMaterialsPage = () => {
               <Typography variant="body1">
                 Course Progress: {progressData.progressPercentage.toFixed(0)}%
               </Typography>
-              <LinearProgress
-                variant="determinate"
-                value={progressData.progressPercentage}
-              />
+              <LinearProgress variant="determinate" value={progressData.progressPercentage} />
             </Box>
 
-            <Button
-              variant="contained"
-              onClick={generateCertificate}
-              disabled={progressData.progressPercentage < 100 || loading}
-              sx={{ marginBottom: 2, marginRight: 2 }}
-            >
+            <Button variant="contained" onClick={generateCertificate} disabled={progressData.progressPercentage < 100 || loading} sx={{ marginBottom: 2, marginRight: 2 }} >
               Generate Certificate
             </Button>
             {certificateUrl && (
@@ -232,13 +213,7 @@ const CourseMaterialsPage = () => {
                 <Typography variant="body1" sx={{ marginBottom: 1 }}>
                   Your certificate is ready!
                 </Typography>
-                <Button
-                  variant="contained"
-                  color="success"
-                  component="a"
-                  href={certificateUrl}
-                  download="Course_Certificate.pdf"
-                >
+                <Button variant="contained" color="success" component="a" href={certificateUrl} download="Course_Certificate.pdf" >
                   Download Certificate
                 </Button>
               </Box>
@@ -287,12 +262,7 @@ const CourseMaterialsPage = () => {
           </Box>
         </Box>
         {/* Quiz Dialog */}
-        <Dialog
-          open={showQuiz}
-          fullWidth
-          maxWidth="md"
-          onClose={() => setShowQuiz(false)}
-        >
+        <Dialog open={showQuiz} fullWidth maxWidth="md" onClose={() => setShowQuiz(false)} >
           <Box sx={{ p: 2 }}>
             {quizContent && (
               <Quiz

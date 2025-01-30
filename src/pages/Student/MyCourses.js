@@ -52,7 +52,7 @@ const MyCourses = () => {
                   <CardMedia
                     component="img"
                     height="140"
-                    image={course.thumbnail || 'https://via.placeholder.com/300'}
+                    image={`http://localhost:3001${course.thumbnail}` || 'https://via.placeholder.com/300'}
                     alt={course.title}
                   />
                   <CardContent>
