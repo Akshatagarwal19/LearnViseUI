@@ -39,6 +39,25 @@ axiosInstance.interceptors.response.use(
 
 const courseApi = {
 
+  getStudents: async () => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/users/students`);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching students:", error);
+      throw error;
+    }
+  },
+
+  getInstructors: async () => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/users/instructors`);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching instructors:", error);
+      throw error;
+    }
+  },
   logout: async () => {
     try {
       const response = await axiosInstance.post('/auth/logout'); // Adjust endpoint as needed
@@ -110,7 +129,7 @@ const courseApi = {
 
   deleteLesson: async (courseId, sectionId, lessonId) => {
     try {
-      const response = await axiosInstance.delete(`/courses/${courseId}/sections/${sectionId}/lessons/${lessonId}`);
+      const response = await axiosInstance.delete(`/courses/${courseId}/lessons/${lessonId}`);
       return response.data;
     } catch (error) {
       console.error('Error deleting lesson:', error.response?.data || error.message);

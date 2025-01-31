@@ -6,6 +6,7 @@ const Home = React.lazy(() => import("./pages/Home"));
 const Login = React.lazy(() => import("./pages/Login"));
 const Signup = React.lazy(() => import("./pages/Signup"));
 const InstructorDashboard = React.lazy(() => import("./pages/Instructor/InstructorDashboard"));
+const AdminDashboard = React.lazy(() => import("./pages/Admin/AdminDashboard"))
 const ManageCourses = React.lazy(() => import("./pages/Instructor/ManageCourse"))
 const StudentCourses = React.lazy(() => import("./pages/Student/MyCourses"));
 const CourseForm = React.lazy(() => import("./pages/Instructor/CourseForm"));
@@ -32,6 +33,7 @@ const App = () => (
         <Route path="/Student/MyCourses" element={<StudentCourses />}/>
         <Route path="/instructor/course/new" element={<CourseForm />}/>
         <Route path="/instructor/lesson/new" element={<LessonForm />}/>
+        <Route path="/Admin" element={<AdminDashboard />}/>
         <Route path="/payment" element={<Payment />}/>
         <Route path="/quiz/create/new" element={<QuizCreationForm />}/>
         <Route path="/quiz" element={<Quiz />}/>

@@ -1,12 +1,5 @@
 import React, { useState } from "react";
-import {
-  Container,
-  Box,
-  Typography,
-  TextField,
-  Button,
-  CircularProgress,
-} from "@mui/material";
+import { Container, Box, Typography, TextField, Button, CircularProgress } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import Navbar from "../components/Navbar";
@@ -60,6 +53,8 @@ const Login = () => {
       // Redirect based on role
       if (role === "Instructor") {
         navigate("/instructor/dashboard");
+      } else if (role === "Admin") {
+        navigate("/Admin");
       } else {
         navigate("/");
       }

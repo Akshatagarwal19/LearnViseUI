@@ -53,6 +53,8 @@ const Navbar = () => {
     const { username, role } = decoded;
     if (role === "Instructor") {
       navigate("/instructor/dashboard");
+    } else if (role === "Admin") {
+      navigate("/Admin");
     } else {
       navigate("/student/mycourses");
     }

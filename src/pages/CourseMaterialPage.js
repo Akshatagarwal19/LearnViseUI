@@ -116,31 +116,31 @@ const CourseMaterialsPage = () => {
         return quizData.questions.map(q => ({
             question: q.questionText,
             options: q.options,
-            correctAnswer: q.correctOption // Note: The Quiz component will need to handle 0-based index
+            correctAnswer: q.correctOption 
         }));
     };
 
-    const BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001'; // Set this dynamically based on your environment
+    const BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001'; 
 
 const renderContent = () => {
     if (!currentLesson) {
         return <Typography variant="body1">No lesson selected.</Typography>;
     }
 
-    const fileUrl = `${BASE_URL}${currentLesson.fileUrl}`; // Dynamically set the full URL for the file
+    const fileUrl = `${BASE_URL}${currentLesson.fileUrl}`; 
 
     switch (currentLesson.contentType) {
         case "video":
           return (
-            <video controls style={{ width: "100%" }}>
+            <video controls style={{ width: "100%" }} key={fileUrl}>
                 <source src={fileUrl} type="video/mp4" />
                 Your browser does not support the video tag.
             </video>
         );
         case "pdf":
-            return <iframe src={fileUrl} title="Pdf Viewer" style={{ width: "100%", height: "600px" }} />;
+            return <iframe src={fileUrl} title="Pdf Viewer" style={{ width: "100%", height: "600px" }} key={fileUrl}/>;
         case "excel":
-            return <iframe src={fileUrl} title="Excel Viewer" style={{ width: "100%", height: "600px" }} />;
+            return <iframe src={fileUrl} title="Excel Viewer" style={{ width: "100%", height: "600px" }} key={fileUrl}/>;
         default:
             return <Typography>Unsupported File Type</Typography>;
     }
@@ -229,11 +229,7 @@ const renderContent = () => {
                   console.error("No lesson selected");
                 }
               }}
-              disabled={
-                !currentLesson ||
-                progressData.completedLessons.includes(currentLesson?._id) ||
-                loading
-              }
+              disabled={ !currentLesson || progressData.completedLessons.includes(currentLesson?._id) || loading }
               sx={{ marginBottom: 2, marginRight: 2 }}
             >
               Take Lesson Quiz
@@ -242,7 +238,7 @@ const renderContent = () => {
               variant="contained"
               onClick={() => {
                 const currentIndex = courseData?.lessons?.findIndex(
-                  (l) => l.id === currentLesson?.id
+                  (l) => l._id === currentLesson?._id
                 );
                 if (
                   currentIndex !== -1 &&
@@ -251,11 +247,7 @@ const renderContent = () => {
                   setCurrentLesson(courseData.lessons[currentIndex + 1]);
                 }
               }}
-              disabled={
-                !currentLesson ||
-                currentLesson?._id ===
-                  courseData?.lessons[courseData?.lessons.length - 1]?._id
-              }
+              disabled={!currentLesson || courseData?.lessons?.findIndex((l) => l._id === currentLesson?._id) === courseData?.lessons?.length - 1}
             >
               Next lesson
             </Button>

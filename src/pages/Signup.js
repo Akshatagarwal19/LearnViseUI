@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Container, Box, Typography, TextField, Button, CircularProgress } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import axios from "axios";
@@ -9,6 +10,7 @@ const Signup = () => {
   const [loading, setLoading] = useState({ primary: false, secondary: false });
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -26,6 +28,7 @@ const Signup = () => {
 
       if (response.status === 201) {
         setSuccess("Signup successful! Please log in.");
+        navigate("/login")
         setForm({ username: "", email: "", password: "" });
       } else {
         setError("Unexpected response from the server.");
@@ -111,6 +114,16 @@ const Signup = () => {
               disabled={loading.primary || loading.secondary}
             >
               {loading.secondary ? <CircularProgress size={24} color="inherit" /> : "Signup Instructor"}
+            </Button>
+            <Button
+              variant="contained"
+              color="secondary"
+              onClick={() => handleSubmit("http://localhost:3001/api/auth/signup/Admin", "secondary")}
+              fullWidth
+              sx={{ padding: "1rem" }}
+              disabled={loading.primary || loading.secondary}
+            >
+              {loading.secondary ? <CircularProgress size={24} color="inherit" /> : "Signup Admin"}
             </Button>
           </Box>
         </Box>

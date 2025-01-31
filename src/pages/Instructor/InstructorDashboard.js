@@ -118,7 +118,7 @@ const InstructorDashboard = () => {
       <Box
         sx={{
           height: { xs: "60vh", sm: "50vh", md: "50vh" },
-          backgroundImage: "url(/bg2.webp)", // Correct URL for the background image
+          backgroundImage: "url(/Herosection1.jpg)", // Correct URL for the background image
           backgroundSize: "cover",
           backgroundPosition: "center",
           display: "flex",
