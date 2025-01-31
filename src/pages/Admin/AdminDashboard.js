@@ -34,9 +34,10 @@ const AdminDashboard = () => {
     totalInstructors: 0,
     totalCourses: 85,
     totalRevenue: 45000,
+    totalTransactions: 150  // Added static transaction data
   });
 
-  const [refreshKey, setRefreshKey] = useState(0); // For manual refresh
+  const [refreshKey, setRefreshKey] = useState(0);
 
   const fetchOverviewData = async () => {
     setLoading(true);
@@ -184,12 +185,11 @@ const AdminDashboard = () => {
 
           <Grid item xs={12} md={4}>
             <StatCard
-              title="Student-Instructor Ratio"
-              value={loading ? "..." : 
-                `${(overviewData.totalStudents / overviewData.totalInstructors).toFixed(1)}:1`}
-              icon={<StudentIcon />}
-              color="info"
-              subtitle="Average Students per Instructor"
+              title="Transactions"
+              value={overviewData.totalTransactions}
+              icon={<MoneyIcon />}
+              color="success"
+              subtitle="Total Completed Transactions"
             />
           </Grid>
         </Grid>
