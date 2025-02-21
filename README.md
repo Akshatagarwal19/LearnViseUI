@@ -1,70 +1,71 @@
-# Getting Started with Create React App
+# LearnVise - An Innovative E-Learning Platform 🚀
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## 📌 Overview
+LearnVise is a modern e-learning platform designed to enhance online education by providing an interactive and engaging learning experience. It features quizzes, progress tracking, and a user-friendly interface to help learners track their journey effectively.
 
-## Available Scripts
+## 🎥 Demo
+<video width="100%" controls>
+  <source src="[YOUR_VIDEO_LINK.mp4](https://drive.google.com/file/d/1dV7uaMrC-T-EecE6gMWJgFaALTUK1QsL/view?usp=drive_link)" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
 
-In the project directory, you can run:
+## 🛠 Tech Stack
+- **Backend:** Node.js, Express.js, Multer, MongoDB
+- **Frontend:** React.js, Material-UI, Redux, CSS3
 
-### `npm start`
+## ✨ Features
+✅ Interactive quizzes for learning assessment  
+✅ Robust progress tracking system  
+✅ User-friendly UI with Material-UI components  
+✅ Secure file uploads with Multer  
+✅ State management using Redux  
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## 🚀 Getting Started
+### 1️⃣ Clone the Repositories
+#### Backend:
+```bash
+git clone https://github.com/Akshatagarwal19/Learnvise.git
+cd Learnvise
+```
+#### Frontend:
+```bash
+git clone https://github.com/Akshatagarwal19/LearnViseUI.git
+cd LearnViseUI
+```
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+### 2️⃣ Install Dependencies
+#### Backend:
+```bash
+npm install
+```
+#### Frontend:
+```bash
+npm install
+```
 
-### `npm test`
+### 3️⃣ Run the Application
+#### Backend:
+```bash
+npm start
+```
+#### Frontend:
+```bash
+npm start
+```
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## 📂 Project Structure
+```
+Learnvise/
+│── backend/                # Node.js backend
+│── frontend/               # React.js frontend
+│── README.md               # Project documentation
+```
 
-### `npm run build`
+## 🤝 Contributing
+Contributions are welcome! Feel free to fork the repo and submit a PR. 😊
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## 📜 License
+This project is open-source and available under the [MIT License](LICENSE).
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+---
+Made with ❤️ by **Akshat Agarwal**
