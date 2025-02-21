@@ -5,7 +5,7 @@ LearnVise is a modern e-learning platform designed to enhance online education b
 
 ## 🎥 Demo
 <video width="100%" controls>
-  <source src="[YOUR_VIDEO_LINK.mp4](https://drive.google.com/file/d/1dV7uaMrC-T-EecE6gMWJgFaALTUK1QsL/view?usp=drive_link)" type="video/mp4">
+  <source src="https://github.com/Akshatagarwal19/LearnViseUI/blob/main/chrome_mfgN5m6eo1.mp4" type="video/mp4">
   Your browser does not support the video tag.
 </video>
 
